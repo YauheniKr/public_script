@@ -3,6 +3,8 @@ import sys
 import getpass
 import telnetlib
 import time
+import re
+from tabulate import tabulate
 
 
 def open_excel_routers(file):
@@ -13,6 +15,8 @@ def open_excel_routers(file):
         addresses.append(sheet['A'+str(row)].value)
     return addresses
 
+
+"""
 def device_dict(device_list, device_template):
     device_dict_list = []
     for dev in device_list:
@@ -21,7 +25,19 @@ def device_dict(device_list, device_template):
             device_dic[key] = dev[(device_template.index(key))]
             device_dict_list.append(device_dic)
     return device_dict_list
+"""
 
+
+def parser_show_interface_description (output, template):
+    import textfsm
+    result = []
+    f = open(template)
+    re_table = textfsm.TextFSM(f)
+    result_header = re_table.header
+    result.append(result_header)
+    result_output = re_table.ParseText(output)
+    result.extend(result_output)
+    return result
 
 
 """
@@ -67,24 +83,31 @@ def send_show_command(address_list, command, Username, Password):
 device_list = []
 device = []
 device_template = ['device_type', 'ip', 'username', 'password', 'enable']
-command = 'show mac table'.encode('utf-8')
+#command = 'show mac table'.encode('utf-8')
 
-print('Insert Username, Password and device type for connection')
+print('Insert Username and Password')
 Username = input('Username:').encode('utf-8')
 Password = getpass.getpass().encode('utf-8')
-enable_Password = Password
+print('Insert command for send to routers')
+command = input('Command:').encode('utf-8')
+#enable_Password = Password
 #device_type = input('Device Type(cisco_ios for ssh or cisco_ios_telnet for telnet ):')
 #device.append(device_type)
 
+template = 'template.txt'
 file = sys.argv[1]
 address_list = open_excel_routers(file)
+"""
 for address in address_list:
     device.append(address)
-    device = device + Username.split() + Password.split() + enable_Password.split()
+    device = device + Username.split() + Password.split() #+ enable_Password.split()
     device_list.append(device)
     #device = []
 device_list = device_dict(device_list, device_template)
 #command_listing = send_show_command(device_list, command)
-test = send_show_command(address_list, command, Username, Password)
-print(test)
+"""
+output_command = send_show_command(address_list, command, Username, Password)
+output_command_cleared = re.sub('(\r\n {66})', '', ''.join(output_command))
+listing = parser_show_interface_description(output_command_cleared, template)
+print(tabulate(listing[1:], headers=listing[0]))
 
