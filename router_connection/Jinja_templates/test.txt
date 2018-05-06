@@ -1,1 +1,10 @@
-
+interface GigabitEthernet1/0/9
+ description cust0763 / Stravita
+ port access vlan 3296
+ broadcast-suppression pps 2000
+ multicast-suppression pps 2000
+ port auto-power-down
+ stp edged-port enable
+ lldp admin-status disable
+ qos lr outbound cir 26048
+ qos lr inbound cir 26048
