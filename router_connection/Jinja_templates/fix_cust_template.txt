@@ -1,0 +1,4 @@
+
+interface vlan {{ vlan }}
+ ip vrf cust0000
+ ip address {{ ipaddress }} 255.255.255.252
