@@ -23,7 +23,7 @@ def save_output_to_excel(output_list, file_name):
     wb = Workbook()
     sheet = wb.active
     for i in range(0, len(output_list)):
-        for k in range(0, 6):
+        for k in range(0, len(output_list[i])):
             sheet.cell(row=(i+1), column=(k+1)).value = output_list[i][k]
     wb.save(file_name)
 
@@ -58,6 +58,7 @@ def conn_threads(function, devices, command, Username, Password, limit=5):
                       for idx in range(0, len(devices), limit))
 
     for group in devices_groups:
+        print('Connection to device {}'.format(group))
         threads = []
         q = Queue()
 
@@ -83,7 +84,7 @@ def send_show_command(IP, command, Username, Password, queue):
     '''
     for IP in address_list:
     '''
-    print('Connection to device {}'.format(IP))
+    #print('Connection to device {}'.format(IP))
     with telnetlib.Telnet(IP) as t:
         t.read_until(b'Username:')
         t.write(Username + b'\n')
@@ -92,10 +93,10 @@ def send_show_command(IP, command, Username, Password, queue):
         t.write(Password + b'\n')
         t.write(b'terminal length 0\n')
         t.write(command + b'\n')
-        time.sleep(5)
+        time.sleep(10)
 
         #output = t.read_very_eager()
-        output = t.read_very_eager()
+        output = t.read_very_eager().decode('ASCII', 'ignore')
         queue.put({IP: output})
 
 listing_out = []
@@ -110,7 +111,7 @@ Password = getpass.getpass().encode('utf-8')
 print('Insert command for send to routers')
 command = input('Command:').encode('utf-8')
 
-template = 'ZTE_intf_descr_template.txt'
+#template = 'ZTE_intf_descr_template.txt'
 #file = sys.argv[1]
 file='router_test_1.xlsx'
 address_list = open_excel_routers(file)
@@ -120,7 +121,7 @@ output_command = conn_threads(send_show_command, address_list, command, Username
 print(output_command)
 
 
-'''for dict in output_command:
+for dict in output_command:
     listing = parser_show_interface_description_clitable(re.sub('(\r\n {66})*', '', ''.join(list(dict.values()))), command.decode('utf-8'))
     listing_out.extend(listing)
 
@@ -128,4 +129,3 @@ print(listing_out)
 output_file = save_output_to_excel(listing_out, output_file_name)
 
 print('Скрипт выполнялся {}'.format(datetime.now() - start_time))
-'''
