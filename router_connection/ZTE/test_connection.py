@@ -1,17 +1,17 @@
-import netmiko
+from pprint import pprint
+from netmiko import ConnectHandler
 import getpass
 import openpyxl
+from itertools import repeat
+from concurrent.futures import ThreadPoolExecutor
 
-class CiscoSSH:
-    def __init__(self, *args):
-        device_params_key = ['username', 'password', 'secret', 'ip']
-        device_params = {key:value for (key, value) in zip(device_params_key, args)}
-        device_params.update({'device_type': 'cisco_ios'})
-        self.ssh = netmiko.ConnectHandler(**device_params)
-        self.ssh.enable()
-
-    def send_show_command(self, command):
-        return self.ssh.send_command(command)
+def connect_ssh(device_dict, command):
+    print(device_dict)
+    print('Connection to device: {}'.format(device_dict['ip']))
+    with ConnectHandler(**device_dict) as ssh:
+        ssh.enable()
+        result = ssh.send_command(command)
+    return {device_dict['ip']: result}
 
 def open_excel_routers(file):
     addresses = []
@@ -22,11 +22,34 @@ def open_excel_routers(file):
     return addresses
 
 
+def threads_conn(function, devices, command, limit=2):
+    with ThreadPoolExecutor(max_workers=limit) as executor:
+        f_result = executor.map(function, devices, repeat(command))
+    return list(f_result)
+
+
+
+device_dict_list = []
+device_template = ['ip', 'device_type', 'username', 'password', 'secret']
+
+
 Username = input('Username:')
 Password = getpass.getpass()
 print('Insert command for send to routers')
 command = input('Command:')
 device_type = input('Device type:')
-file = input('Filename:')
+device_values_kn = [device_type, Username, Password, Password]
+#file = input('Filename:')
+dict_values = []
+file = 'routers.xlsx'
 routers = open_excel_routers(file)
-print(routers)
+
+for ip in routers:
+    device_values = []
+    device_values.append(ip)
+    device_values.extend(device_values_kn)
+    device_dict_main = {k: v for (k, v) in zip(device_template, device_values)}
+    device_dict_list.append(device_dict_main)
+
+all_done = threads_conn(connect_ssh, device_dict_list, command)
+pprint(all_done)
