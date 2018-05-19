@@ -6,7 +6,6 @@ from itertools import repeat
 from concurrent.futures import ThreadPoolExecutor
 
 def connect_ssh(device_dict, command):
-    print(device_dict)
     print('Connection to device: {}'.format(device_dict['ip']))
     with ConnectHandler(**device_dict) as ssh:
         ssh.enable()
