@@ -1,16 +1,19 @@
 from pprint import pprint
 from netmiko import ConnectHandler
+from datetime import datetime
 import getpass
 import openpyxl
-from itertools import repeat
-from concurrent.futures import ThreadPoolExecutor
+import netmiko.ssh_exception
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
 
 def connect_ssh(device_dict, command):
-    print('Connection to device: {}'.format(device_dict['ip']))
+    print('Connection to device: {} \n'.format(device_dict['ip']))
     with ConnectHandler(**device_dict) as ssh:
         ssh.enable()
         result = ssh.send_command(command)
     return {device_dict['ip']: result}
+
 
 def open_excel_routers(file):
     addresses = []
@@ -22,14 +25,34 @@ def open_excel_routers(file):
 
 
 def threads_conn(function, devices, command, limit=2):
+    all_results = {}
     with ThreadPoolExecutor(max_workers=limit) as executor:
-        f_result = executor.map(function, devices, repeat(command))
-    return list(f_result)
+        future_ssh = [executor.submit(function, device, command) for device in devices]
+        for f in as_completed(future_ssh):
+            try:
+                result = f.result()
+            except netmiko.ssh_exception.NetMikoAuthenticationException as e:
+                print(e)
+                break
+            except netmiko.ssh_exception.NetMikoTimeoutException as e:
+                print(e)
+            else:
+                all_results.update(result)
+        for f in reversed(future_ssh):
+            if not f.cancel():
+                try:
+                    all_results.update(f.result())
+                except netmiko.ssh_exception.SSHException:
+                    pass
+    return all_results
 
 
 
 device_dict_list = []
 device_template = ['ip', 'device_type', 'username', 'password', 'secret']
+
+start_msg = '===> {} Connection to device: {}'
+received_msg = '<=== {} Received result from device: {}'
 
 
 Username = input('Username:')
