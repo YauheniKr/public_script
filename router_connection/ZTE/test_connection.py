@@ -11,7 +11,7 @@ def connect_ssh(device_dict, command):
     print('Connection to device: {} \n'.format(device_dict['ip']))
     with ConnectHandler(**device_dict) as ssh:
         ssh.enable()
-        result = ssh.send_command(command)
+        result = ssh.send_command(command, strip_prompt=False)
     return {device_dict['ip']: result}
 
 
