@@ -7,11 +7,28 @@ import netmiko.ssh_exception
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
-def connect_ssh(device_dict, command):
+class RouterSSH:
+    def __init__(self, **device_dict):
+        self.device_dict = device_dict
+        self.ssh = ConnectHandler(**device_dict)
+
+    def send_command(self, command, strip_prompt=False):
+        if not self.ssh.check_enable_mode:
+            self.ssh.enable()
+        return self.ssh.send_command(command)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, traceback):
+        print('Закрываю соединение с устройством: {}'.format(self.device_dict['ip']))
+        self.ssh.disconnect()
+
+
+def connect_ssh(device_dict, command, ):
     print('Connection to device: {} \n'.format(device_dict['ip']))
-    with ConnectHandler(**device_dict) as ssh:
-        ssh.enable()
-        result = ssh.send_command(command, strip_prompt=False)
+    with RouterSSH(**device_dict) as session:
+        result = session.send_command(command)
     return {device_dict['ip']: result}
 
 
