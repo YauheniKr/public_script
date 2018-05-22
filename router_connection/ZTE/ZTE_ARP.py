@@ -145,8 +145,9 @@ device_list = device_dict(device_list, device_template)
 start_time = datetime.now()
 output_command = conn_threads(send_show_command, address_list, command, Username, Password)
 for dict in output_command:
-    listing = parser_show_interface_description('\r\n'.join(list(dict.values())), template)
+    listing = parser_show_interface_description_clitable(re.sub('(\r\n {66})*', '', ''.join(list(dict.values()))), command)
     listing_out.extend(listing)
+    -
 output_file = save_output_to_excel(listing_out, output_file_name)
 
 print('Скрипт выполнялся {}'.format(datetime.now() - start_time))
