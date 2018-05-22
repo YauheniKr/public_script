@@ -3,7 +3,9 @@ from netmiko import ConnectHandler
 from datetime import datetime
 import getpass
 import openpyxl
+import re
 import netmiko.ssh_exception
+import clitable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
@@ -12,10 +14,10 @@ class RouterSSH:
         self.device_dict = device_dict
         self.ssh = ConnectHandler(**device_dict)
 
-    def send_command(self, command, strip_prompt=False):
+    def send_command(self, command):
         if not self.ssh.check_enable_mode:
             self.ssh.enable()
-        return self.ssh.send_command(command)
+        return self.ssh.send_command(command, strip_prompt=False)
 
     def __enter__(self):
         return self
@@ -31,6 +33,17 @@ def connect_ssh(device_dict, command, ):
         result = session.send_command(command)
     return {device_dict['ip']: result}
 
+
+def parser_show_interface_description_clitable (output, command):
+    result = []
+    cli_table = clitable.CliTable('index', 'templates')
+    attributes = {'Command': command, 'Vendor': 'ZTE'}
+    cli_table.ParseCmd(output, attributes)
+    data_rows = [list(row) for row in cli_table]
+    header = list(cli_table.header)
+    result.append(header)
+    result.extend(list(data_rows))
+    return result
 
 def open_excel_routers(file):
     addresses = []
@@ -91,4 +104,15 @@ for ip in routers:
     device_dict_list.append(device_dict_main)
 
 all_done = threads_conn(connect_ssh, device_dict_list, command)
-pprint(all_done)
+listing_out = []
+print(all_done)
+
+"""
+for dict in all_done:
+    print(dict)
+    #listing = parser_show_interface_description_clitable(re.sub('(\r\n {66})*', '', ''.join(list(dict.values()))),command)
+"""
+listing = parser_show_interface_description_clitable(re.sub('(\r\n {66})*', '', ''.join(list(all_done.values())), command))
+listing_out.extend(listing)
+
+print(listing_out)
