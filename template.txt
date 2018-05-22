@@ -1,0 +1,11 @@
+Value Filldown LOCAL_HOST (\S+)
+Value Required INTERFACE (\S+)
+Value ADMIN_STATUS (up|down|administratively down)
+Value PHY_STATUS (up|down)
+Value PROTOCOL (up|down)
+Value DESCRIPTION (\S+| )
+
+Start
+  ^${LOCAL_HOST}#
+  ^${INTERFACE}\s+${ADMIN_STATUS}\s+${PHY_STATUS}\s+${PROTOCOL}\s+${DESCRIPTION} -> Record
+
