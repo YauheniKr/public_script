@@ -110,7 +110,7 @@ Username = input('Username:').encode('utf-8')
 Password = getpass.getpass().encode('utf-8')
 print('Insert command for send to routers')
 command = input('Command:').encode('utf-8')
-
+pib
 #template = 'ZTE_intf_descr_template.txt'
 #file = sys.argv[1]
 file='router_test_1.xlsx'
