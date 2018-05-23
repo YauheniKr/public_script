@@ -5,7 +5,7 @@ import getpass
 import openpyxl
 import re
 import netmiko.ssh_exception
-import clitable
+#import clitable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
@@ -49,6 +49,7 @@ def open_excel_routers(file):
     addresses = []
     wb = openpyxl.load_workbook(file)
     sheet = wb.active
+    print(sheet.max_row, sheet.max_column)
     for row in range(1, sheet.max_row+1):
         addresses.append(sheet['A'+str(row)].value)
     return addresses
@@ -85,6 +86,9 @@ start_msg = '===> {} Connection to device: {}'
 received_msg = '<=== {} Received result from device: {}'
 
 
+file = 'routers_1.xlsx'
+routers = open_excel_routers(file)
+"""
 Username = input('Username:')
 Password = getpass.getpass()
 print('Insert command for send to routers')
@@ -107,12 +111,13 @@ all_done = threads_conn(connect_ssh, device_dict_list, command)
 listing_out = []
 print(all_done)
 
-"""
+
 for dict in all_done:
     print(dict)
     #listing = parser_show_interface_description_clitable(re.sub('(\r\n {66})*', '', ''.join(list(dict.values()))),command)
-"""
+
 listing = parser_show_interface_description_clitable(re.sub('(\r\n {66})*', '', ''.join(list(all_done.values())), command))
 listing_out.extend(listing)
 
 print(listing_out)
+"""
