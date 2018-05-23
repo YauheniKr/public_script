@@ -86,9 +86,7 @@ start_msg = '===> {} Connection to device: {}'
 received_msg = '<=== {} Received result from device: {}'
 
 
-file = 'routers_1.xlsx'
-routers = open_excel_routers(file)
-"""
+
 Username = input('Username:')
 Password = getpass.getpass()
 print('Insert command for send to routers')
@@ -111,13 +109,12 @@ all_done = threads_conn(connect_ssh, device_dict_list, command)
 listing_out = []
 print(all_done)
 
-
+'''
 for dict in all_done:
     print(dict)
     #listing = parser_show_interface_description_clitable(re.sub('(\r\n {66})*', '', ''.join(list(dict.values()))),command)
-
+'''
 listing = parser_show_interface_description_clitable(re.sub('(\r\n {66})*', '', ''.join(list(all_done.values())), command))
 listing_out.extend(listing)
 
 print(listing_out)
-"""
