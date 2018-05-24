@@ -95,7 +95,7 @@ device_type = input('Device type:')
 device_values_kn = [device_type, Username, Password, Password]
 #file = input('Filename:')
 dict_values = []
-file = 'routers_1.xlsx'
+file = 'routers_1.ods'
 routers = open_excel_routers(file)
 
 for ip in routers:
