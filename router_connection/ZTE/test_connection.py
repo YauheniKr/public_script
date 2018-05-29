@@ -85,11 +85,11 @@ start_msg = '===> {} Connection to device: {}'
 received_msg = '<=== {} Received result from device: {}'
 
 
-Username = input('Username:')
-Password = getpass.getpass()
-print('Insert command for send to routers')
-command = input('Command:')
-device_type = input('Device type:')
+Username = 'cisco'#input('Username:')
+Password = 'cisco'#getpass.getpass()
+#print('Insert command for send to routers')
+command = 'sh ip interf brie'#input('Command:')
+device_type = 'cisco_ios'#nput('Device type:')
 device_values_kn = [device_type, Username, Password, Password]
 #file = input('Filename:')
 dict_values = []

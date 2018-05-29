@@ -1,4 +1,4 @@
-Value INTF (\S+)
+Value Required INTF (\S+)
 Value IPADDR (\S+)
 Value STATUS (up|down|administratively down)
 Value PROTO (up|down)
@@ -6,4 +6,4 @@ Value Fillup Hostname (\S+)
 
 Start
   ^${INTF}\s+${IPADDR}\s+\w+\s+\w+\s+${STATUS}\s+${PROTO} -> Record
-  ^${Hostname}#
+  ^${Hostname}[#>] -> Continue.Record
