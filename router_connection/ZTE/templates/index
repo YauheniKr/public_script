@@ -2,3 +2,4 @@ Template, Hostname, Vendor, Command
 ZTE_intf_descr_template.txt, .*, ZTE, sh[[ow]] interface d[[escription]]
 ZTE_template_arp.txt, .*, ZTE, sh[[ow]] ar[[p]]
 ZTE_SFP_template.txt, .*, ZTE, sh[[ow]] op[[tical-info]]
+Cisco_sh_ip_interface_br.txt, .*, Cisco, sh[[ow]] ip inter[[face]] br[[ief]]

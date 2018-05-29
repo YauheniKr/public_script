@@ -37,7 +37,7 @@ def connect_ssh(device_dict, command, ):
 def parser_show_interface_description_clitable (output, command):
     result = []
     cli_table = clitable.CliTable('index', 'templates')
-    attributes = {'Command': command, 'Vendor': 'ZTE'}
+    attributes = {'Command': command, 'Vendor': 'Cisco'}
     cli_table.ParseCmd(output, attributes)
     data_rows = [list(row) for row in cli_table]
     header = list(cli_table.header)
@@ -112,7 +112,7 @@ for dict in all_done:
     print(dict)
     #listing = parser_show_interface_description_clitable(re.sub('(\r\n {66})*', '', ''.join(list(dict.values()))),command)
 """
-listing = parser_show_interface_description_clitable(re.sub('(\r\n {66})*', '', ''.join(list(all_done.values())), command))
+listing = parser_show_interface_description_clitable(re.sub('(\r\n {66})*', '', '\n'.join(list(all_done.values()))), command)
 listing_out.extend(listing)
 
 print(listing_out)
