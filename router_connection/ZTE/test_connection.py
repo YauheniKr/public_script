@@ -77,6 +77,16 @@ def threads_conn(function, devices, command, limit=2):
     return all_results
 
 
+def save_output_to_excel(output_list, file_name):
+    from openpyxl import Workbook
+    wb = Workbook()
+    sheet = wb.active
+    for i in range(0, len(output_list)):
+        for k in range(0, len(output_list[i])):
+            sheet.cell(row=(i+1), column=(k+1)).value = output_list[i][k]
+    wb.save(file_name)
+
+
 
 device_dict_list = []
 device_template = ['ip', 'device_type', 'username', 'password', 'secret']
@@ -91,9 +101,9 @@ print('Insert command for send to routers')
 command = input('Command:')
 device_type = input('Device type:')
 device_values_kn = [device_type, Username, Password, Password]
-#file = input('Filename:')
+file_output = input('Filename:')
 dict_values = []
-file = 'routers.xlsx'
+file = 'routers_1.xlsx'
 routers = open_excel_routers(file)
 
 for ip in routers:
@@ -112,7 +122,7 @@ for dict in all_done:
     print(dict)
     #listing = parser_show_interface_description_clitable(re.sub('(\r\n {66})*', '', ''.join(list(dict.values()))),command)
 """
-listing = parser_show_interface_description_clitable(re.sub('(\r\n {66})*', '', ''.join(list(all_done.values())), command))
+listing = parser_show_interface_description_clitable(re.sub('(\r\n {66})*', '', ''.join(list(all_done.values()))), command)
 listing_out.extend(listing)
 
 print(listing_out)
