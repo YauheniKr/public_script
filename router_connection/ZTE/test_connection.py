@@ -1,3 +1,5 @@
+#-*- coding: utf-8 -*-
+
 from pprint import pprint
 import netmiko
 from netmiko import ConnectHandler
@@ -57,7 +59,7 @@ def open_excel_routers(file):
     return addresses
 
 
-def threads_conn(function, devices, command, limit=2):
+def threads_conn(function, devices, command, limit=5):
     all_results = {}
     with ThreadPoolExecutor(max_workers=limit) as executor:
         future_ssh = [executor.submit(function, device, command) for device in devices]
@@ -104,9 +106,9 @@ print('Insert command for send to routers')
 command = input('Command:')
 device_type = input('Device type:')
 device_values_kn = [device_type, Username, Password, Password]
-file_output = input('Filename:')
+output_file_name = 'output_Minsk.xlsx'
 dict_values = []
-file = 'routers_1.xlsx'
+file = '../Routers/Minsk.xlsx'
 routers = open_excel_routers(file)
 
 for ip in routers:
@@ -120,12 +122,9 @@ all_done = threads_conn(connect_ssh, device_dict_list, command)
 listing_out = []
 print(all_done)
 
-"""
-for dict in all_done:
-    print(dict)
-    #listing = parser_show_interface_description_clitable(re.sub('(\r\n {66})*', '', ''.join(list(dict.values()))),command)
-"""
 listing = parser_show_interface_description_clitable(re.sub('(\r\n {66})*', '', ''.join(list(all_done.values()))), command)
 listing_out.extend(listing)
 
 print(listing_out)
+
+output_file = save_output_to_excel(listing_out, output_file_name)
