@@ -1,4 +1,5 @@
 from pprint import pprint
+import netmiko
 from netmiko import ConnectHandler
 from datetime import datetime
 import getpass
@@ -15,8 +16,10 @@ class RouterSSH:
         self.ssh = ConnectHandler(**device_dict)
 
     def send_command(self, command):
+        '''
         if not self.ssh.check_enable_mode:
             self.ssh.enable()
+        '''
         return self.ssh.send_command(command, strip_prompt=False)
 
     def __enter__(self):
