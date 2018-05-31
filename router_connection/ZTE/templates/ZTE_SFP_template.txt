@@ -1,13 +1,14 @@
-Value Filldown LOCAL_HOST (\S+)
 Value Required INTF (.*gei-\S+)
 Value SFPTYPE (electric|optical)
 Value INTFTYPE (\d*\S*\s*\S*)
+Value Fillup LOCAL_HOST (\S+)
 
 
 
 
 Start
-  ^${LOCAL_HOST}#
+
   ^InterfaceName  : ${INTF}
   ^SfpAttribute   : ${SFPTYPE}
   ^ETH            : ${INTFTYPE} -> Record
+  ^${LOCAL_HOST}# -> Continue.Record
