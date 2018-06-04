@@ -35,7 +35,3 @@ for line_1 in f1:
             line_1_value.append(line_2[2].value)
             f2_value.append(line_1_value)
 save_output_to_excel(f2_value, file_name)
-'''
-print(f1[0])
-print(f2[0])
-'''
