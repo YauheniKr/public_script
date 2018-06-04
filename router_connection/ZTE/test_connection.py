@@ -40,7 +40,7 @@ def connect_ssh(device_dict, command, ):
 def parser_show_interface_description_clitable (output, command):
     result = []
     cli_table = clitable.CliTable('index', 'templates')
-    attributes = {'Command': command, 'Vendor': 'ZTE'}
+    attributes = {'Command': command, 'Vendor': 'Cisco'}
     cli_table.ParseCmd(output, attributes)
     data_rows = [list(row) for row in cli_table]
     header = list(cli_table.header)
@@ -52,12 +52,16 @@ def open_excel_routers(file):
     addresses = []
     wb = openpyxl.load_workbook(file)
     sheet = wb.active
+    for column in sheet.columns:
+        addresses.append([address.value for address in column])
+    '''
     for row in range(1, sheet.max_row+1):
         addresses.append(sheet['A'+str(row)].value)
+    '''
     return addresses
 
 
-def threads_conn(function, devices, command, limit=5):
+def threads_conn(function, devices, command, limit=2):
     all_results = {}
     with ThreadPoolExecutor(max_workers=limit) as executor:
         future_ssh = [executor.submit(function, device, command) for device in devices]
@@ -102,19 +106,24 @@ Username = input('Username:')
 Password = getpass.getpass()
 print('Insert command for send to routers')
 command = input('Command:')
-device_type = input('Device type:')
-device_values_kn = [device_type, Username, Password, Password]
-output_file_name = 'output_Minsk.xlsx'
+#device_type = input('Device type:')
+device_values_kn = [Username, Password, Password]
+#output_file_name = 'output_Minsk.xlsx'
 dict_values = []
-file = '../Routers/Minsk.xlsx'
-routers = open_excel_routers(file)
 
-for ip in routers:
+file = 'routers_1.xlsx'
+routers_param = open_excel_routers(file)
+
+
+for i in range(0, len(routers_param[0])):
     device_values = []
-    device_values.append(ip)
+    device_values.append(routers_param[0][i])
+    device_values.append(routers_param[1][i])
     device_values.extend(device_values_kn)
     device_dict_main = {k: v for (k, v) in zip(device_template, device_values)}
     device_dict_list.append(device_dict_main)
+print(device_dict_list)
+
 
 all_done = threads_conn(connect_ssh, device_dict_list, command)
 listing_out = []
@@ -125,4 +134,4 @@ listing_out.extend(listing)
 
 print(listing_out)
 
-output_file = save_output_to_excel(listing_out, output_file_name)
+#output_file = save_output_to_excel(listing_out, output_file_name)
