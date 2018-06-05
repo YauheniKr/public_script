@@ -7,7 +7,6 @@ Value Fillup LOCAL_HOST (\S+)
 
 
 Start
-
   ^InterfaceName  : ${INTF}
   ^SfpAttribute   : ${SFPTYPE}
   ^ETH            : ${INTFTYPE} -> Record
