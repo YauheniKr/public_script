@@ -20,6 +20,10 @@ class RouterSSH:
     def send_command(self, command):
         if not self.ssh.check_enable_mode:
             self.ssh.enable()
+        '''
+        if self.device_dict['device_type'] == 'hp':
+            self.ssh.send_command('_cmdline-mode on \n Y\nJinhua1920unauthorized')
+        '''
         return self.ssh.send_command(command, strip_prompt=False)
 
     def __enter__(self):
@@ -54,10 +58,6 @@ def open_excel_routers(file):
     sheet = wb.active
     for column in sheet.columns:
         addresses.append([address.value for address in column])
-    '''
-    for row in range(1, sheet.max_row+1):
-        addresses.append(sheet['A'+str(row)].value)
-    '''
     return addresses
 
 
@@ -122,7 +122,6 @@ for i in range(0, len(routers_param[0])):
     device_values.extend(device_values_kn)
     device_dict_main = {k: v for (k, v) in zip(device_template, device_values)}
     device_dict_list.append(device_dict_main)
-print(device_dict_list)
 
 
 all_done = threads_conn(connect_ssh, device_dict_list, command)
