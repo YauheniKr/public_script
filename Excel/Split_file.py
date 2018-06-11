@@ -20,9 +20,9 @@ def save_output_to_excel(output_list, file_name):
 
 f2_value = []
 line_1_value = []
-file_name = 'output_split_Grodno.xlsx'
-file1 = 'output_Grodno.xlsx'
-file2 = 'output_opt_Grodno.xlsx'
+file_name = 'output_split.xlsx'
+file1 = 'output.xlsx'
+file2 = 'output_opt.xlsx'
 f1 = open_excel_routers(file1)
 f2 = open_excel_routers(file2)
 for line_1 in f1:
