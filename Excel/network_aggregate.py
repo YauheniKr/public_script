@@ -1,5 +1,6 @@
 import openpyxl
 import netaddr
+import sys
 
 
 def open_excel_routers(file):
@@ -26,14 +27,13 @@ def save_output_to_excel(output_list, file_name):
     wb.save(file_name)
 
 
-
-
-file_name = 'output_aggr.xlsx'
-opcos_address = open_excel_routers('список публичных префиксов.xlsx')
-sheet_name = get_excel_sheets('список публичных префиксов.xlsx')
+prefix_file = sys.argv[1]
+output_file_name = sys.argv[2]
+opcos_address = open_excel_routers(prefix_file)
+sheet_name = get_excel_sheets(prefix_file)
 list_network_full = dict.fromkeys(sheet_name)
 for position, address in enumerate(opcos_address):
     list_netw_aggr = netaddr.cidr_merge(address)
     list_network = [str(network) for network in list_netw_aggr]
     list_network_full[sheet_name[position]] = list_network
-save_output_to_excel(list_network_full, file_name)
+save_output_to_excel(list_network_full, output_file_name)
