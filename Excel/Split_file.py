@@ -1,4 +1,5 @@
 import openpyxl
+from datetime import datetime
 
 def open_excel_routers(file):
     addresses = []
@@ -18,13 +19,15 @@ def save_output_to_excel(output_list, file_name):
             sheet.cell(row=output_list.index(output_list[i])+1, column=(k+1)).value = output_list[i][k]
     wb.save(file_name)
 
+start_time = datetime.now()
 f2_value = []
 line_1_value = []
 file_name = 'output_split.xlsx'
-file1 = 'output.xlsx'
-file2 = 'output_opt.xlsx'
+file1 = '/home/smilodon/Downloads/output_Minsk.xlsx'
+file2 = '/home/smilodon/Downloads/output_opt_Minsk.xlsx'
 f1 = open_excel_routers(file1)
 f2 = open_excel_routers(file2)
+
 for line_1 in f1:
     for line_2 in f2:
         if line_1[0].value == line_2[0].value and line_1[5].value == line_2[3].value:
@@ -34,4 +37,6 @@ for line_1 in f1:
             line_1_value.append(line_2[1].value)
             line_1_value.append(line_2[2].value)
             f2_value.append(line_1_value)
+#print(f2_value)
 save_output_to_excel(f2_value, file_name)
+print('Скрипт выполнялся {}'.format(datetime.now()-start_time))
