@@ -29,10 +29,10 @@ def save_output_to_excel(output_list, file_name):
 
 prefix_file = sys.argv[1]
 output_file_name = sys.argv[2]
-opcos_address = open_excel_routers(prefix_file)
+addresses_from_file = open_excel_routers(prefix_file)
 sheet_name = get_excel_sheets(prefix_file)
 list_network_full = dict.fromkeys(sheet_name)
-for position, address in enumerate(opcos_address):
+for position, address in enumerate(addresses_from_file):
     list_netw_aggr = netaddr.cidr_merge(address)
     list_network = [str(network) for network in list_netw_aggr]
     list_network_full[sheet_name[position]] = list_network
