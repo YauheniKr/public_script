@@ -20,6 +20,13 @@ class RouterSSH:
             self.ssh.enable()
         return self.ssh.send_command(command, strip_prompt=False)
 
+    def send_config_commands(self, commands, file=None):
+        app_log.trace('Send command {} to device {} \n'
+                      .format(commands, self.device_dict['ip']))
+        self.ssh.send_config_from_file(config_file=file, **kwargs)
+        return None
+
+
     def __enter__(self):
         return self
 

@@ -30,7 +30,7 @@ def router_params(routers_parameter):
         yield device_dict
 
 
-def parser_show_interface_description_clitable(output, command):
+def parser_show_clitable(output, command):
     result = []
     cli_table = clitable.CliTable('index', 'templates')
     attributes = {'Command': command, 'Vendor': 'Cisco'}
@@ -46,3 +46,8 @@ def input_credentials():
     Username = input('Username:')
     Password = getpass.getpass()
     return Username, Password
+
+def take_command_line():
+    print('Insert command for send to routers')
+    command = input('Command:')
+    return command
