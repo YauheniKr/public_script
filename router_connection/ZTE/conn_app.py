@@ -52,3 +52,6 @@ def take_command_line():
     command = input('Command:')
     return command
 
+
+if __name__ == '__main__':
+    main()

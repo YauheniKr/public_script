@@ -26,7 +26,6 @@ class RouterSSH:
         self.ssh.send_config_from_file(config_file=file, **kwargs)
         return None
 
-
     def __enter__(self):
         return self
 
