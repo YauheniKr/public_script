@@ -1,6 +1,5 @@
 #-*- coding: utf-8 -*-
 
-from pprint import pprint
 import netmiko
 from netmiko import ConnectHandler
 from datetime import datetime
@@ -10,7 +9,10 @@ import re
 import netmiko.ssh_exception
 import clitable
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import sys
+import logbook
 
+app_log = logbook.Logger('App')
 
 class RouterSSH:
     def __init__(self, **device_dict):
@@ -18,6 +20,7 @@ class RouterSSH:
         self.ssh = ConnectHandler(**device_dict)
 
     def send_command(self, command):
+        app_log.trace('Send command {} to device {} \n'.format(command, self.device_dict['ip']))
         if not self.ssh.check_enable_mode:
             self.ssh.enable()
         '''
@@ -30,12 +33,14 @@ class RouterSSH:
         return self
 
     def __exit__(self, exc_type, exc_val, traceback):
-        print('Закрываю соединение с устройством: {}'.format(self.device_dict['ip']))
+        print('Закрываю соединение с устройством: {} \n'.format(self.device_dict['ip']))
+        app_log.trace('Закрываю соединение с устройством: {} \n'.format(self.device_dict['ip']))
         self.ssh.disconnect()
 
 
 def connect_ssh(device_dict, command, ):
-    print('Connection to device: {} \n'.format(device_dict['ip']))
+    app_log.trace('Connection to device: {}'.format(device_dict['ip']))
+    print('Connection to device: {}'.format(device_dict['ip']))
     with RouterSSH(**device_dict) as session:
         result = session.send_command(command)
     return {device_dict['ip']: result}
@@ -52,13 +57,22 @@ def parser_show_interface_description_clitable (output, command):
     result.extend(list(data_rows))
     return result
 
-def open_excel_routers(file):
-    addresses = []
+
+def open_excel_file(file):
     wb = openpyxl.load_workbook(file)
     sheet = wb.active
-    for column in sheet.columns:
-        addresses.append([address.value for address in column])
-    return addresses
+    for column in sheet.rows:
+        yield [address.value for address in column]
+
+
+def save_output_to_file(output_list, file_name):
+    from openpyxl import Workbook
+    wb = Workbook()
+    sheet = wb.active
+    for i in range(0, len(output_list)):
+        for k in range(0, len(output_list[i])):
+            sheet.cell(row=(i+1), column=(k+1)).value = output_list[i][k]
+    wb.save(file_name)
 
 
 def threads_conn(function, devices, command, limit=2):
@@ -69,9 +83,11 @@ def threads_conn(function, devices, command, limit=2):
             try:
                 result = f.result()
             except netmiko.ssh_exception.NetMikoAuthenticationException as e:
+                app_log.trace(e)
                 print(e)
                 break
             except netmiko.ssh_exception.NetMikoTimeoutException as e:
+                app_log.trace(e)
                 print(e)
             else:
                 all_results.update(result)
@@ -84,18 +100,29 @@ def threads_conn(function, devices, command, limit=2):
     return all_results
 
 
-def save_output_to_excel(output_list, file_name):
-    from openpyxl import Workbook
-    wb = Workbook()
-    sheet = wb.active
-    for i in range(0, len(output_list)):
-        for k in range(0, len(output_list[i])):
-            sheet.cell(row=(i+1), column=(k+1)).value = output_list[i][k]
-    wb.save(file_name)
+def router_params(routers_parameter):
+    for router in routers_parameter:
+        router.extend(device_values_kn)
+        device_dict = {k: v for (k, v) in zip(device_template, router)}
+        yield device_dict
 
 
+def init_logging(filename: str = None):
+    level = logbook.TRACE
 
-device_dict_list = []
+    if filename:
+        logbook.TimedRotatingFileHandler(filename, level=level).push_application()
+    else:
+        logbook.StreamHandler(sys.stdout, level=level).push_application()
+
+    msg = 'Logging initialized, level: {}, mode: {}'.format(
+        level,
+        "stdout mode" if not filename else 'file mode: ' + filename
+    )
+    logger = logbook.Logger('Startup')
+    logger.notice(msg)
+
+
 device_template = ['ip', 'device_type', 'username', 'password', 'secret']
 
 start_msg = '===> {} Connection to device: {}'
@@ -106,31 +133,21 @@ Username = input('Username:')
 Password = getpass.getpass()
 print('Insert command for send to routers')
 command = input('Command:')
-#device_type = input('Device type:')
 device_values_kn = [Username, Password, Password]
 #output_file_name = 'output_Minsk.xlsx'
-dict_values = []
-
 file = 'routers_1.xlsx'
-routers_param = open_excel_routers(file)
+init_logging('movie-app.log')
 
-
-for i in range(0, len(routers_param[0])):
-    device_values = []
-    device_values.append(routers_param[0][i])
-    device_values.append(routers_param[1][i])
-    device_values.extend(device_values_kn)
-    device_dict_main = {k: v for (k, v) in zip(device_template, device_values)}
-    device_dict_list.append(device_dict_main)
-
-
-all_done = threads_conn(connect_ssh, device_dict_list, command)
-listing_out = []
+routers_parameter = open_excel_file(file)
+router = router_params(routers_parameter)
+all_done = threads_conn(connect_ssh, router, command)
 print(all_done)
 
+'''
 listing = parser_show_interface_description_clitable(re.sub('(\r\n {66})*', '', ''.join(list(all_done.values()))), command)
 listing_out.extend(listing)
 
 print(listing_out)
 
-#output_file = save_output_to_excel(listing_out, output_file_name)
+#output_file = save_output_to_file(listing_out, output_file_name)
+'''

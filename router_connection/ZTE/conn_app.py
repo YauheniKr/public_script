@@ -51,3 +51,4 @@ def take_command_line():
     print('Insert command for send to routers')
     command = input('Command:')
     return command
+
