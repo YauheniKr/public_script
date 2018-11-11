@@ -84,3 +84,6 @@ def init_logging(filename: str = None):
     )
     logger = logbook.Logger('Startup')
     logger.notice(msg)
+
+
+#TODO: Сделать режим отправки команд конфигурирования
