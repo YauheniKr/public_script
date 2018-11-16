@@ -6,8 +6,8 @@ import getpass
 def open_excel_file(file):
     wb = openpyxl.load_workbook(file)
     sheet = wb.active
-    for column in sheet.rows:
-        yield [address.value for address in column]
+    for row in sheet.rows:
+        yield [address.value for address in row]
 
 
 def save_output_to_file(output_list, file_name):
@@ -23,23 +23,27 @@ def save_output_to_file(output_list, file_name):
 def router_params(routers_parameter):
     Username, Password = input_credentials()
     device_values_kn = [Username, Password, Password]
-    device_template = ['ip', 'device_type', 'username', 'password', 'secret']
+    device_template = ['ip', 'device_type', 'command', 'username', 'password', 'secret']
     for router in routers_parameter:
         router.extend(device_values_kn)
         device_dict = {k: v for (k, v) in zip(device_template, router)}
         yield device_dict
 
 
-def parser_show_clitable(output, command):
+def parser_show_clitable(output_list):
     result = []
     cli_table = clitable.CliTable('index', 'templates')
-    attributes = {'Command': command, 'Vendor': 'Cisco'}
+    attributes = {'Command': command['command'], 'Vendor': 'Cisco'}
     cli_table.ParseCmd(output, attributes)
     data_rows = [list(row) for row in cli_table]
     header = list(cli_table.header)
     result.append(header)
     result.extend(list(data_rows))
     return result
+
+
+
+
 
 
 def input_credentials():
@@ -53,6 +57,8 @@ def take_command_line():
     return command
 
 #TODO: Сделать распознавание команды из файла
+
+#TODO: Сделать парсинг конфига с распознаванием выполненой команды из передаваемого словаря
 
 #TODO: Сделать определение вендора для парсинга по файлу(или словарю) справочнику
 

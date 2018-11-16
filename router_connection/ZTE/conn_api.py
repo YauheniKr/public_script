@@ -11,14 +11,16 @@ app_log = logbook.Logger('App')
 class RouterSSH:
     def __init__(self, **device_dict):
         self.device_dict = device_dict
+        self.command = device_dict['command']
+        del(device_dict['command'])
         self.ssh = ConnectHandler(**device_dict)
 
-    def send_command(self, command):
+    def send_command(self):
         app_log.trace('Send command {} to device {} \n'
-                      .format(command, self.device_dict['ip']))
+                      .format(self.command, self.device_dict['ip']))
         if not self.ssh.check_enable_mode:
             self.ssh.enable()
-        return self.ssh.send_command(command, strip_prompt=False)
+        return self.ssh.send_command(self.command, strip_prompt=False)
 
     def send_config_commands(self, commands, file=None):
         app_log.trace('Send command {} to device {} \n'
@@ -37,18 +39,19 @@ class RouterSSH:
         self.ssh.disconnect()
 
 
-def connect_ssh(device_dict, command, ):
+def connect_ssh(device_dict):
     app_log.trace('Connection to device: {}'.format(device_dict['ip']))
     print('Connection to device: {}'.format(device_dict['ip']))
     with RouterSSH(**device_dict) as session:
-        result = session.send_command(command)
-    return {device_dict['ip']: result}
+        result = session.send_command()
+    return {device_dict['ip']: result, 'command': device_dict['command']}
 
 
-def threads_conn(function, devices, command, limit=2):
-    all_results = {}
+
+def threads_conn(function, devices, limit=2):
+    all_results = []
     with ThreadPoolExecutor(max_workers=limit) as executor:
-        future_ssh = [executor.submit(function, device, command)
+        future_ssh = [executor.submit(function, device)
                       for device in devices]
         for f in as_completed(future_ssh):
             try:
@@ -61,11 +64,12 @@ def threads_conn(function, devices, command, limit=2):
                 app_log.trace(e)
                 print(e)
             else:
-                all_results.update(result)
+                all_results.append(result)
         for f in reversed(future_ssh):
-            if not f.cancel():
+            if not f.cancel() and f.result() not in all_results:
+                print(f.result)
                 try:
-                    all_results.update(f.result())
+                    all_results.append(f.result())
                 except netmiko.ssh_exception.SSHException:
                     pass
     return all_results
