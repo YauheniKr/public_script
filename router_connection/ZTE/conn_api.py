@@ -44,7 +44,7 @@ def connect_ssh(device_dict):
     print('Connection to device: {}'.format(device_dict['ip']))
     with RouterSSH(**device_dict) as session:
         result = session.send_command()
-    return {device_dict['ip']: result, 'command': device_dict['command']}
+    return {'output': result, 'command': device_dict['command']}
 
 
 

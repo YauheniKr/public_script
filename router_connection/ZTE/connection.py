@@ -10,9 +10,12 @@ def main():
     routers_parameter = open_excel_file(file)
     router = router_params(routers_parameter)
     inf = threads_conn(connect_ssh, router)
-    all_done = parser_show_clitable(''.join(list(inf.values())), router)
-    print(f'')
-    print(tabulate(all_done, headers = all_done[0], tablefmt = 'grid', stralign='center'))
+    print(inf)
+    all_done = parser_show_clitable(inf)
+    for output in all_done:
+        print(f'')
+        print(tabulate(output[1:], headers = output[0], tablefmt = 'grid', stralign='center'))
+
 
 if __name__ == '__main__':
     main()

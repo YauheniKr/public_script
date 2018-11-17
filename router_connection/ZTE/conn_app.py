@@ -30,16 +30,17 @@ def router_params(routers_parameter):
         yield device_dict
 
 
-def parser_show_clitable(output_list):
-    result = []
+def parser_show_clitable(output):
     cli_table = clitable.CliTable('index', 'templates')
-    attributes = {'Command': command['command'], 'Vendor': 'Cisco'}
-    cli_table.ParseCmd(output, attributes)
-    data_rows = [list(row) for row in cli_table]
-    header = list(cli_table.header)
-    result.append(header)
-    result.extend(list(data_rows))
-    return result
+    for router in output:
+        result = []
+        attributes = {'Command': router['command'], 'Vendor': 'Cisco'}
+        cli_table.ParseCmd(router['output'], attributes)
+        data_rows = [list(row) for row in cli_table]
+        header = list(cli_table.header)
+        result.append(header)
+        result.extend(list(data_rows))
+        yield result
 
 
 
