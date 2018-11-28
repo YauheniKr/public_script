@@ -3,7 +3,7 @@ from conn_app import open_excel_file, router_params, take_command_line, input_cr
 from conn_app import parser_show_clitable
 from tabulate import tabulate
 
-file = './Routers/routers_test.xlsx'
+file = '../Routers/REP190.xlsx'
 
 def main():
     init_logging('movie-app.log')
