@@ -3,4 +3,5 @@ ZTE_intf_descr_template.txt, .*, ZTE, sh[[ow]] interface d[[escription]]
 ZTE_template_arp.txt, .*, ZTE, sh[[ow]] ar[[p]]
 ZTE_SFP_template.txt, .*, ZTE, sh[[ow]] op[[tical-info]]
 Cisco_sh_ip_interface_br.txt, .*, Cisco, sh[[ow]] ip inter[[face]] br[[ief]]
+Cisco_xr_sh_ipv4_interface_br.txt, .*, Cisco, sh[[ow]] ipv4 inter[[face]] br[[ief]]
 Cisco_sh_clock.txt, .*, Cisco, sh[[ow]] clock

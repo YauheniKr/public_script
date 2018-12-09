@@ -48,7 +48,7 @@ def connect_ssh(device_dict):
 
 
 
-def threads_conn(function, devices, limit=2):
+def threads_conn(function, devices, limit=5):
     all_results = []
     with ThreadPoolExecutor(max_workers=limit) as executor:
         future_ssh = [executor.submit(function, device)

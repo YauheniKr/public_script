@@ -1,0 +1,11 @@
+Value Required INTF (\S+)
+Value IPADDR (\S+)
+Value STATUS (Up|Down|Shutdown)
+Value PROTO (Up|Down)
+Value Vrf_name (\S+)
+Value Fillup Hostname (\S+)
+
+Start
+  ^$$
+  ^${INTF}\s+${IPADDR}\s+${STATUS}\s+${PROTO}\s+${Vrf_name} -> Continue.Record
+  ^${Hostname}[#>] -> Record
